@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Data + ML artifacts (large, regeneratable — do not commit)
+training/artifacts/*
+!training/artifacts/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# iOS / Xcode (matters starting Phase 2)
+ios/build/
+ios/DerivedData/
+*.xcuserstate
+xcuserdata/
+*.swiftpm/configuration/
+
+# IDE
+.vscode/
+.idea/

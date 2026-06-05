@@ -1,0 +1,5 @@
+# Runtime dependencies for Phase 1.
+# Upper-bound on major versions so a future breaking release doesn't silently change behavior.
+
+requests>=2.32.0,<3.0
+ijson>=3.3.0,<4.0

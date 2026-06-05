@@ -1,0 +1,24 @@
+# Tool configuration for the training/ directory.
+#
+# We deliberately do NOT use this as an installable package — we run scripts
+# via `python -m data.scryfall_download` etc. No build-backend needed.
+# Dependencies live in requirements.txt / requirements-dev.txt.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = ["-ra", "--strict-markers"]
+# Add the training/ directory to sys.path so tests can do `from data.x import y`.
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# E,F: pycodestyle errors + Pyflakes (standard).
+# I:   isort — auto-sort imports.
+# B:   flake8-bugbear — likely-bug patterns.
+# UP:  pyupgrade — modern Python idioms.
+# RUF: ruff-specific rules.
+select = ["E", "F", "I", "B", "UP", "RUF"]
