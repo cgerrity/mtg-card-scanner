@@ -37,10 +37,17 @@ BULK_DATA_API: Final = "https://api.scryfall.com/bulk-data"
 DEFAULT_BULK_TYPE: Final = "default_cards"
 ARTIFACTS_DIR: Final = Path(__file__).resolve().parent.parent / "artifacts"
 
+# Scryfall requires User-Agent + Accept on every API request — without these,
+# requests are rejected with 400. https://scryfall.com/docs/api
+SCRYFALL_HEADERS: Final = {
+    "User-Agent": "MTGCardScanner/0.1 (+https://github.com/cgerrity/mtg-card-scanner)",
+    "Accept": "application/json",
+}
+
 
 def fetch_bulk_metadata(bulk_type: str) -> dict:
     """Return the Scryfall bulk-data entry of the given type."""
-    resp = requests.get(BULK_DATA_API, timeout=30)
+    resp = requests.get(BULK_DATA_API, headers=SCRYFALL_HEADERS, timeout=30)
     resp.raise_for_status()
     payload = resp.json()
     for entry in payload["data"]:
@@ -63,8 +70,9 @@ def stream_download(url: str, dest: Path, *, chunk_size: int = 1 << 16) -> str:
     sha = hashlib.sha256()
     tmp = dest.with_suffix(dest.suffix + ".partial")
     bytes_seen = 0
+    progress = _make_progress_printer()
 
-    with requests.get(url, stream=True, timeout=60) as resp:
+    with requests.get(url, stream=True, headers=SCRYFALL_HEADERS, timeout=60) as resp:
         resp.raise_for_status()
         total = int(resp.headers.get("Content-Length", "0"))
         with tmp.open("wb") as fh:
@@ -74,20 +82,47 @@ def stream_download(url: str, dest: Path, *, chunk_size: int = 1 << 16) -> str:
                 fh.write(chunk)
                 sha.update(chunk)
                 bytes_seen += len(chunk)
-                _print_progress(bytes_seen, total)
+                progress(bytes_seen, total)
 
-    print()  # newline after the progress line
+    if sys.stderr.isatty():
+        print(file=sys.stderr)  # newline after the inline progress line
     tmp.rename(dest)  # atomic
     return sha.hexdigest()
 
 
-def _print_progress(seen: int, total: int) -> None:
-    if total > 0:
-        pct = 100 * seen / total
-        sys.stdout.write(f"\r  {seen / 1e6:>7.1f} MB / {total / 1e6:.1f} MB ({pct:5.1f}%)")
-    else:
-        sys.stdout.write(f"\r  {seen / 1e6:>7.1f} MB (size unknown)")
-    sys.stdout.flush()
+def _make_progress_printer():
+    """Return a progress function that:
+       - rewrites a single line if stderr is a TTY (interactive use), or
+       - prints one line per ~25 MB chunk otherwise (non-interactive: pipes,
+         logs, CI captures). This keeps logs sane when piped.
+    """
+    is_tty = sys.stderr.isatty()
+    last_logged_mb = 0.0
+    log_every_mb = 25.0
+
+    def progress(seen: int, total: int) -> None:
+        nonlocal last_logged_mb
+        seen_mb = seen / 1e6
+        if is_tty:
+            if total > 0:
+                msg = f"\r  {seen_mb:>7.1f} MB / {total / 1e6:.1f} MB ({100 * seen / total:5.1f}%)"
+            else:
+                msg = f"\r  {seen_mb:>7.1f} MB (size unknown)"
+            sys.stderr.write(msg)
+            sys.stderr.flush()
+        else:
+            if seen_mb - last_logged_mb >= log_every_mb:
+                if total > 0:
+                    print(
+                        f"  {seen_mb:>7.1f} MB / {total / 1e6:.1f} MB "
+                        f"({100 * seen / total:5.1f}%)",
+                        file=sys.stderr,
+                    )
+                else:
+                    print(f"  {seen_mb:>7.1f} MB downloaded", file=sys.stderr)
+                last_logged_mb = seen_mb
+
+    return progress
 
 
 def main() -> int:

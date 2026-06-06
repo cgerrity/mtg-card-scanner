@@ -36,6 +36,7 @@ New topic dirs get added as the build touches new areas.
 
 ### Data engineering
 - [SQLite for read-mostly workloads](data-engineering/sqlite-readmostly-design.md) — schema choices when reads dominate
+- [Data-source API hygiene](data-engineering/data-source-api-hygiene.md) — User-Agent, retry, hash verification, idempotency, progress reporting
 
 ---
 
