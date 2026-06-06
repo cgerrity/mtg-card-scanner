@@ -11,7 +11,7 @@ Build an iPhone app that uses the camera and on-device machine learning to ident
 | Dimension | Decision |
 |---|---|
 | Primary use case | Personal collection tracking |
-| Target device | iPhone running **iOS 26.5** (Claude Gerrity's device) |
+| Target device | iPhone running **iOS 26.5** |
 | Deployment target | iOS 26.0 minimum |
 | Distribution | Sideload via free Apple ID (no $99/yr Apple Developer Program) |
 | ML inference | **On-device** via Core ML |

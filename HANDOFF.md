@@ -60,6 +60,7 @@ Full Phase 1 detail in `PLAN.md` § 5.
   - Swift `struct` (value semantics) ≈ Python `dataclass(frozen=True)` semantically
   - SwiftUI `@State` ≈ Python's reactive-state libraries (Solara, Streamlit) but compile-time-checked
 - **Be patient with Apple-ecosystem friction**: Xcode quirks, code signing, certificates, provisioning profiles. These trip up everyone the first time.
+- **Maintain the learning library.** When you teach a new concept, add a file under `learning/<topic>/<concept>.md` and update `learning/README.md`'s index. The directory is tracked in git (renders well on GitHub). Format documented in `learning/README.md`. Don't defer this to "later" — do it in the same turn the concept is introduced.
 
 ---
 

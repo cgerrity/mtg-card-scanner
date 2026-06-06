@@ -6,14 +6,16 @@ See [`../PLAN.md`](../PLAN.md) for the full project plan.
 
 ## Setup
 
-Requires **Python 3.11+**.
+Requires **Python 3.11+**. We use `python3.13` to create the venv explicitly — bare `python3` may resolve to whatever's first in your `PATH`, which on macOS systems with multiple Pythons installed is often an outdated Anaconda or system Python (3.8 / 3.9). See `learning/python-tooling/python-version-management.md` for why this matters.
 
 ```bash
 cd training
-python3 -m venv .venv
+python3.13 -m venv .venv               # not python3 — be explicit
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
+
+If you don't have python3.13: `brew install python@3.13`, or download from python.org.
 
 To re-enter the venv in a new shell:
 

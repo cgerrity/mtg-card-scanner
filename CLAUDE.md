@@ -22,6 +22,17 @@ An iPhone app that uses the camera + on-device machine learning to scan Magic: T
 - Don't compress responses just because they're long — depth is what the user wants.
 - Be patient with Apple-ecosystem friction (Xcode quirks, signing, certificates, provisioning).
 
+### Learning notes — maintain these as you teach
+
+The `learning/` directory is the user's reference library — per-concept teaching files organized by topic, tracked in git so they sync across machines and render on GitHub. **When you teach a new concept in a session, add or update the corresponding learning file in the same turn.** Don't defer.
+
+- Format and topic layout documented in `learning/README.md`.
+- Files use a consistent template: TL;DR → What it is → Why it matters → How it works → Watch out for → See also → Interview angle.
+- Use Mermaid / ASCII diagrams where visuals help.
+- Cross-link related concepts with relative markdown links.
+- Update `learning/README.md`'s index when adding files.
+- Existing topic dirs: `ml-engineering/`, `apple-ios/`, `python-tooling/`, `data-engineering/`. Create new ones as needed.
+
 ## Build philosophy (validated user choice)
 
 **Deep on each layer before moving to the next.** Complete and validate each phase before starting the next. Do not switch to a vertical-slice approach without re-asking the user.

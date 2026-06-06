@@ -1,34 +1,68 @@
-# macOS
+# --- macOS ---
 .DS_Store
 *.swp
+*.swo
 
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
 .venv/
 venv/
 .env
+.env.*
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 build/
 dist/
+.coverage
+htmlcov/
+.tox/
+.python-version
 
-# Data + ML artifacts (large, regeneratable — do not commit)
+# --- Data + ML artifacts (large, regeneratable — never commit) ---
 training/artifacts/*
 !training/artifacts/.gitkeep
+training/datasets/
+# Intermediate ML training outputs
+training/models/**/*.pt
+training/models/**/*.pth
+training/models/**/*.ckpt
+training/models/**/*.onnx
+training/models/**/*.mlpackage/
+training/models/**/checkpoints/
+training/models/**/runs/
+training/models/**/wandb/
+training/models/**/mlruns/
+training/models/**/lightning_logs/
+# (Shipped models under ios/.../Resources/ are NOT ignored — they belong in git.)
 
-# Jupyter
+# --- Jupyter ---
 .ipynb_checkpoints/
 
-# iOS / Xcode (matters starting Phase 2)
+# --- Apple signing / certificates / provisioning (NEVER COMMIT) ---
+*.mobileprovision
+*.p12
+*.cer
+*.pem
+*.cert
+*.certSigningRequest
+AuthKey_*.p8
+
+# --- iOS / Xcode (matters starting Phase 2) ---
 ios/build/
 ios/DerivedData/
+DerivedData/
 *.xcuserstate
 xcuserdata/
 *.swiftpm/configuration/
 
-# IDE
+# --- Generic secrets ---
+*.secret
+secrets/
+
+# --- IDE ---
 .vscode/
 .idea/
