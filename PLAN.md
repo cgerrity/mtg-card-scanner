@@ -60,8 +60,8 @@ Build an iPhone app that uses the camera and on-device machine learning to ident
                   │
                   ▼
         ┌──────────────────────┐
-        │ Card detection       │  VisionKit DataScannerViewController
-        │  → 4 corner points   │  (fallback: VNDetectRectanglesRequest)
+        │ Card detection       │  AVFoundation AVCaptureSession +
+        │  → 4 corner points   │  Vision VNDetectRectanglesRequest
         └─────────┬────────────┘
                   │
                   ▼
@@ -238,11 +238,10 @@ User chose **deep on each layer before next**. We complete and validate each pha
    - Deployment target: iOS 26.0
    - Bundle ID: `com.cgerrity.MTGScanner`
    - Add `NSCameraUsageDescription` to Info.plist
-2. Camera setup with `AVFoundation` + `AVCaptureSession` for raw frame access.
-3. Integrate `DataScannerViewController` via `UIViewControllerRepresentable` for SwiftUI bridging.
-4. Per-frame: `VNDetectRectanglesRequest` configured with aspect ratio ~0.716 (63/88).
-5. Implement `CGAffineTransform` (or `CIPerspectiveTransform`) to unwarp to canonical pixel size.
-6. Quality scoring:
+2. Camera setup with `AVFoundation` + `AVCaptureSession` for raw frame access; wrap as a SwiftUI view via `UIViewControllerRepresentable`.
+3. Per-frame: `VNDetectRectanglesRequest` configured with aspect ratio ~0.716 (63/88).
+4. Implement `CGAffineTransform` (or `CIPerspectiveTransform`) to unwarp to canonical pixel size.
+5. Quality scoring:
    - In-focus check (Laplacian variance)
    - Glare detection (highlight saturation)
    - Occlusion check (rectangle confidence)

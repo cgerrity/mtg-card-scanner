@@ -29,6 +29,7 @@ New topic dirs get added as the build touches new areas.
 
 ### Apple / iOS
 - [Bundle identifiers](apple-ios/bundle-identifiers.md) — what iOS uses to identify your app, and why stability matters
+- [Xcode project anatomy](apple-ios/xcode-project-anatomy.md) — project / target / scheme, what's inside a .xcodeproj, what to commit
 
 ### Python tooling
 - [Dependency management](python-tooling/dependency-management.md) — requirements.txt, pyproject.toml, pinning, lockfiles

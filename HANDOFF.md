@@ -72,7 +72,7 @@ Full Phase 1 detail in `PLAN.md` § 5.
 - **Card DB on device:** text-only, ~50–100 MB, downloaded first-launch from Scryfall bulk, weekly refresh
 - **Card images:** Scryfall CDN, fetched on demand, locally cached
 - **Storage:** SwiftData + CloudKit
-- **Card detection:** VisionKit `DataScannerViewController`, fallback to `VNDetectRectanglesRequest`
+- **Card detection:** AVFoundation `AVCaptureSession` + Vision `VNDetectRectanglesRequest` (VisionKit `DataScannerViewController` does text+barcodes only — not rectangles; may revisit for OCR in Phase 4)
 - **OCR engine:** Apple Vision `VNRecognizeTextRequest`
 - **Languages:** English only; non-English visually detected, surfaced as "unidentified"
 - **Layouts in scope:** all (standard, DFC, split/fuse/adventure, basic lands, tokens, emblems)
@@ -123,7 +123,7 @@ Full Phase 1 detail in `PLAN.md` § 5.
 | # | Phase | Stack | Status |
 |---|---|---|---|
 | 1 | Foundation + data pipeline | Python | ⏳ Next |
-| 2 | Card-in-frame detection | Swift / VisionKit | — |
+| 2 | Card-in-frame detection | Swift / AVFoundation + Vision | — |
 | 3 | Region extraction | Swift | — |
 | 4 | OCR | Swift / Vision | — |
 | 5 | Matching + multi-frame confidence | Swift | — |

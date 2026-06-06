@@ -48,7 +48,7 @@ The `learning/` directory is the user's reference library — per-concept teachi
 - **Card data:** Scryfall bulk JSON, text-only on-device DB (~50–100 MB), downloaded on first launch, refreshed weekly
 - **Card images:** Scryfall CDN, fetched on demand, locally cached
 - **Storage:** SwiftData + CloudKit sync
-- **Card detection:** VisionKit `DataScannerViewController` (iOS 16+, fits 26.5) with `VNDetectRectanglesRequest` fallback
+- **Card detection:** AVFoundation `AVCaptureSession` + Vision `VNDetectRectanglesRequest` (real-time per-frame rectangle detection). VisionKit `DataScannerViewController` is *not* used for rectangle detection — it handles only text + barcodes; we may use it for OCR in Phase 4.
 - **OCR:** Apple Vision `VNRecognizeTextRequest`
 - **Languages:** English only; non-English visually detected, surfaced as "unidentified"
 - **Card layouts in scope:** all — standard, DFC, split/fuse/adventure, basic lands, tokens, emblems
