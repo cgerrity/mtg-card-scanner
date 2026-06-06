@@ -30,6 +30,10 @@ New topic dirs get added as the build touches new areas.
 ### Apple / iOS
 - [Bundle identifiers](apple-ios/bundle-identifiers.md) — what iOS uses to identify your app, and why stability matters
 - [Xcode project anatomy](apple-ios/xcode-project-anatomy.md) — project / target / scheme, what's inside a .xcodeproj, what to commit
+- [Info.plist](apple-ios/info-plist.md) — app metadata + permission usage descriptions; why modern Xcode often has no physical Info.plist file
+- [AVFoundation camera pipeline](apple-ios/avfoundation-camera-pipeline.md) — session/input/output model, threading, pixel formats, orientation
+- [SwiftUI ↔ UIKit bridging](apple-ios/swiftui-uikit-bridging.md) — UIViewRepresentable for embedding imperative UIKit content
+- [Coordinate spaces in iOS imaging](apple-ios/coordinate-spaces.md) — Vision lower-left vs UIKit upper-left, conversions
 
 ### Python tooling
 - [Dependency management](python-tooling/dependency-management.md) — requirements.txt, pyproject.toml, pinning, lockfiles
