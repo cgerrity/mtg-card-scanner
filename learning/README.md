@@ -26,6 +26,7 @@ New topic dirs get added as the build touches new areas.
 - [Reproducible pipelines](ml-engineering/reproducible-pipelines.md) — what makes a pipeline reproducible and why interviewers ask
 - [Streaming large data](ml-engineering/streaming-large-data.md) — when and how to stream instead of load-all
 - [Bayesian streaming inference](ml-engineering/bayesian-streaming-inference.md) — sequential probability updates, log-space arithmetic
+- [Temporal smoothing of ML output](ml-engineering/temporal-smoothing-of-ml-output.md) — EMA, hysteresis, when not to smooth, Kalman as the principled cousin
 
 ### Apple / iOS
 - [Bundle identifiers](apple-ios/bundle-identifiers.md) — what iOS uses to identify your app, and why stability matters

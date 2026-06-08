@@ -140,11 +140,32 @@ struct CardQuad: Equatable {
     let bottomLeft: CGPoint
     let bottomRight: CGPoint
 
+    init(topLeft: CGPoint, topRight: CGPoint, bottomLeft: CGPoint, bottomRight: CGPoint) {
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
+    }
+
     init(observation: VNRectangleObservation) {
-        self.topLeft     = observation.topLeft
-        self.topRight    = observation.topRight
-        self.bottomLeft  = observation.bottomLeft
-        self.bottomRight = observation.bottomRight
+        self.init(
+            topLeft: observation.topLeft,
+            topRight: observation.topRight,
+            bottomLeft: observation.bottomLeft,
+            bottomRight: observation.bottomRight
+        )
+    }
+
+    /// Exponential moving average between two quads:
+    /// result = prev * (1 - α) + new * α, applied per corner.
+    /// α small → smooth + laggy; α large → responsive + jittery.
+    static func lerp(_ prev: CardQuad, _ next: CardQuad, alpha: Double) -> CardQuad {
+        CardQuad(
+            topLeft:     prev.topLeft.lerp(to: next.topLeft,         t: alpha),
+            topRight:    prev.topRight.lerp(to: next.topRight,       t: alpha),
+            bottomLeft:  prev.bottomLeft.lerp(to: next.bottomLeft,   t: alpha),
+            bottomRight: prev.bottomRight.lerp(to: next.bottomRight, t: alpha)
+        )
     }
 }
 
@@ -153,6 +174,12 @@ extension CGPoint {
     /// SwiftUI space (origin upper-left, points).
     func toSwiftUI(in size: CGSize) -> CGPoint {
         CGPoint(x: x * size.width, y: (1 - y) * size.height)
+    }
+
+    /// Linear interpolation: t=0 returns self, t=1 returns other.
+    func lerp(to other: CGPoint, t: Double) -> CGPoint {
+        CGPoint(x: x * (1 - t) + other.x * t,
+                y: y * (1 - t) + other.y * t)
     }
 }
 
@@ -171,11 +198,22 @@ final class CardDetectionService: NSObject {
         qos: .userInitiated
     )
 
-    /// Most-recent detected card quad; nil if no card visible.
+    /// EMA-smoothed card quad; nil if no card visible. The raw per-frame
+    /// detection is noisy — see `updateSmoothedQuad`.
     var detectedQuad: CardQuad?
 
     /// Lifecycle state for the status UI.
     var sessionState: SessionState = .idle
+
+    // Temporal smoothing parameters.
+    // - smoothingAlpha controls EMA weight on the new observation per frame
+    //   (0 = ignore, 1 = no smoothing). 0.3 ≈ time constant of ~3 frames.
+    // - missingFramesBeforeClear hides the overlay only after the detector
+    //   has failed for this many consecutive frames, masking single-frame
+    //   misses without leaving stale ghost overlays.
+    private let smoothingAlpha: Double = 0.3
+    private let missingFramesBeforeClear: Int = 3
+    private var framesWithoutDetection = 0
 
     enum SessionState: Equatable {
         case idle
@@ -253,6 +291,31 @@ final class CardDetectionService: NSObject {
     private func failOnMain(_ message: String) {
         DispatchQueue.main.async { self.sessionState = .failed(message) }
     }
+
+    /// Push a raw detection into the smoothed value on the main actor.
+    /// - Hits `detectedQuad` with EMA when raw is non-nil.
+    /// - Tolerates a few consecutive frames of nil before clearing, so a
+    ///   single missed frame doesn't blink the overlay off.
+    /// See `learning/ml-engineering/temporal-smoothing-of-ml-output.md`.
+    private func updateSmoothedQuad(_ raw: CardQuad?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let raw {
+                self.framesWithoutDetection = 0
+                if let prev = self.detectedQuad {
+                    self.detectedQuad = CardQuad.lerp(prev, raw, alpha: self.smoothingAlpha)
+                } else {
+                    self.detectedQuad = raw  // first observation: snap in
+                }
+            } else {
+                self.framesWithoutDetection += 1
+                if self.framesWithoutDetection > self.missingFramesBeforeClear {
+                    self.detectedQuad = nil
+                }
+                // else: keep the previous smoothed value (hysteresis).
+            }
+        }
+    }
 }
 
 // MARK: - Per-frame Vision rectangle detection
@@ -273,10 +336,8 @@ extension CardDetectionService: AVCaptureVideoDataOutputSampleBufferDelegate {
         let request = VNDetectRectanglesRequest { [weak self] req, _ in
             guard let self else { return }
             let observation = (req.results as? [VNRectangleObservation])?.first
-            let quad = observation.map { CardQuad(observation: $0) }
-            DispatchQueue.main.async {
-                self.detectedQuad = quad
-            }
+            let rawQuad = observation.map { CardQuad(observation: $0) }
+            self.updateSmoothedQuad(rawQuad)
         }
 
         // MTG card aspect ratio is 63:88 ≈ 0.716 (width:height, both orderings).
